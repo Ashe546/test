@@ -1,97 +1,126 @@
 const express = require('express')
 const app = express()
 const port = 3000
-const mysql = require('mysql2')
+const { createPool } = require('mysql2')
 const bodyparser = require('body-parser')
 
 app.use(bodyparser.json())
 
-var con = mysql.createConnection({
-    host: 'mysql-96508-0.cloudclusters.net',
-    port: '10059',
-    user: 'admin',
-    password: 'Qih3IiKo',
-    database: 'test',
+const pool = createPool({
+    host: '127.0.0.1',
+    port: '8080',
+    user: 'root',
+    password: '0922426392',
+    database: 'school',
 })
 
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-  });
 
 
+// get teacher 
+app.get('/', (req, res) => {
+    pool.query('SELECT * FROM teacher', (err, rows) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(rows)
+        }
+    })
+})
 
+//get subject
+app.get('/subject', (req, res) => {
+    pool.query('SELECT * FROM subject', (err, rows) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(rows)
+        }
+    })
+})
 
+// get staff
+app.get('/staff', (req, res) => {
+    pool.query('SELECT * FROM staff', (err, rows) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(rows)
+        }
+    })
+})
 
+//get teacher name
+app.get('/name', (req, res) => {
 
-
-    app.get('/', (req, res) => {
-        con.query('SELECT * FROM test_1', (err, rows) => {
-            if (err) {
-                res.send(err)
-            } else {
-                res.send(rows)
-            }
-        })
-        // res.send(
-        //    [
-        //      {name: 'ashe', age: 25},
-        //      {name: 'ashe', age: 25},
-        //      {name: 'ashe', age: 25},
-        //      {name: 'ashe', age: 25},
-        //      {name: 'ashe', age: 25},
-        //     ]
-        //     )
+    pool.query('SELECT teacher.subject_id, staff.first_name, teacher.Techer_id,teacher.staff_id, subject.subject_name from teacher \
+    INNER JOIN subject ON teacher.subject_id=subject.Subject_id \
+    INNER JOIN staff on teacher.staff_id=staff.Staff_id', (err, rows) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(rows)
+        }
     })
 
-    // app.get('/subject', (req, res) => {
-    //     pool.query('SELECT * FROM subject', (err, rows) => {
-    //         if (err) {
-    //             res.send(err)
-    //         } else {
-    //             res.send(rows)
-    //         }
-    //     })
-    //     // res.send('Hello World!')
-    // })
+})
+
+//post to teacher
+app.post('/', (req, res) => {
+
+    const Teacher_id = Math.random() * 1000;
+    const Subject_id = 447685974;
+    const Staff_id = 170963707;
 
 
 
-    // app.post('/', (req, res) => {
+    let sql = 'INSERT INTO teacher values(?,?,?)';
 
-    //     const Subject_id = Math.random() * 1000;
-    //     const Subject_name = req.body.Subject_name; 
-    
-    //     let sql = 'INSERT INTO subject values(?,?)'; 
-    
-    //     pool.query(sql, [Subject_id, Subject_name], (err, result) =>  {
-    //         if (err) {
-    //             res.send(err)
-    //         }else{
-    //             res.send(Subject_name);
-    //         }  
-    //     });
-       
-    // })
+    pool.query(sql, [Teacher_id, Subject_id, Staff_id], (err, result) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(Teacher_id);
+        }
+    });
 
-    // app.post('/post', (req, res) => {
 
-    //     const Teacher_id = Math.random() * 1000;
-    //     const Subject_id = 324;
-        
-    
-    //     let sql = 'INSERT INTO teacher values(?,?)'; 
-    
-    //     pool.query(sql, [Teacher_id, Subject_id], (err, result) =>  {
-    //         if (err) {
-    //             res.send(err)
-    //         }else{
-    //             res.send(Teacher_id);
-    //         }  
-    //     });
-    
-       
-    // })
+})
+
+//post to subject
+app.post('/subject', (req, res) => {
+    const Subject_id = Math.random() * 1000000000;
+    const Subject_name = req.body.Subject_name;
+    const Subject_description = req.body.Subject_description;
+    const grade_given_to = JSON.stringify(req.body.grade_given_to)
+
+    let sql = 'INSERT INTO subject values(?,?,?,?)';
+
+    pool.query(sql, [Subject_id, Subject_name, Subject_description, grade_given_to], (err, result) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send(grade_given_to);
+        }
+    });
+})
+
+//post to staff
+app.post('/staff', (req, res) => {
+    const Staff_id = Math.random() * 1000000000;
+    const first_name = req.body.first_name;
+    const last_name = req.body.last_name;
+    const type = 'Teacher'
+
+    let sql = 'INSERT INTO staff values(?,?,?,?)';
+
+    pool.query(sql, [Staff_id, first_name, last_name, type], (err, result) => {
+        if (err) {
+            res.send(err)
+        } else {
+            res.send("welcome" + first_name + last_name);
+        }
+    });
+})
 
 
 app.listen(port, () => {
