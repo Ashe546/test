@@ -26,22 +26,22 @@ con.connect(function(err) {
 
 
     app.get('/', (req, res) => {
-        // pool.query('SELECT * FROM teacher', (err, rows) => {
-        //     if (err) {
-        //         res.send(err)
-        //     } else {
-        //         res.send(rows)
-        //     }
-        // })
-        res.send(
-           [
-             {name: 'ashe', age: 25},
-             {name: 'ashe', age: 25},
-             {name: 'ashe', age: 25},
-             {name: 'ashe', age: 25},
-             {name: 'ashe', age: 25},
-            ]
-            )
+        con.query('SELECT * FROM test_1', (err, rows) => {
+            if (err) {
+                res.send(err)
+            } else {
+                res.send(rows)
+            }
+        })
+        // res.send(
+        //    [
+        //      {name: 'ashe', age: 25},
+        //      {name: 'ashe', age: 25},
+        //      {name: 'ashe', age: 25},
+        //      {name: 'ashe', age: 25},
+        //      {name: 'ashe', age: 25},
+        //     ]
+        //     )
     })
 
     // app.get('/subject', (req, res) => {
