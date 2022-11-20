@@ -1,4 +1,5 @@
 const express = require('express')
+const serverless = require('serverless-http')
 const app = express()
 const port = 3000
 const { createPool } = require('mysql2')
@@ -15,9 +16,12 @@ const pool = createPool({
 })
 
 
+const router = express.Router(); 
+
+
 
 // get teacher 
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     pool.query('SELECT * FROM teacher', (err, rows) => {
         if (err) {
             res.send(err)
@@ -28,7 +32,7 @@ app.get('/', (req, res) => {
 })
 
 //get subject
-app.get('/subject', (req, res) => {
+router.get('/subject', (req, res) => {
     pool.query('SELECT * FROM subject', (err, rows) => {
         if (err) {
             res.send(err)
@@ -39,7 +43,7 @@ app.get('/subject', (req, res) => {
 })
 
 // get staff
-app.get('/staff', (req, res) => {
+router.get('/staff', (req, res) => {
     pool.query('SELECT * FROM staff', (err, rows) => {
         if (err) {
             res.send(err)
@@ -50,7 +54,7 @@ app.get('/staff', (req, res) => {
 })
 
 //get teacher name
-app.get('/name', (req, res) => {
+router.get('/name', (req, res) => {
 
     pool.query('SELECT teacher.subject_id, staff.first_name, teacher.Techer_id,teacher.staff_id, subject.subject_name from teacher \
     INNER JOIN subject ON teacher.subject_id=subject.Subject_id \
@@ -65,7 +69,7 @@ app.get('/name', (req, res) => {
 })
 
 //post to teacher
-app.post('/', (req, res) => {
+router.post('/', (req, res) => {
 
     const Teacher_id = Math.random() * 1000;
     const Subject_id = 447685974;
@@ -87,7 +91,7 @@ app.post('/', (req, res) => {
 })
 
 //post to subject
-app.post('/subject', (req, res) => {
+router.post('/subject', (req, res) => {
     const Subject_id = Math.random() * 1000000000;
     const Subject_name = req.body.Subject_name;
     const Subject_description = req.body.Subject_description;
@@ -105,7 +109,7 @@ app.post('/subject', (req, res) => {
 })
 
 //post to staff
-app.post('/staff', (req, res) => {
+router.post('/staff', (req, res) => {
     const Staff_id = Math.random() * 1000000000;
     const first_name = req.body.first_name;
     const last_name = req.body.last_name;
@@ -122,7 +126,11 @@ app.post('/staff', (req, res) => {
     });
 })
 
+app.use('/.netlify/functions/api', router)
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+// app.listen(port, () => {
+//     console.log(`Example app listening on port ${port}`)
+// })
+
+
+module.exports.handler = serverless(app)
